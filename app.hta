@@ -1,0 +1,77 @@
+<html>
+  <head>
+    <title>Catranfoma v1.0</title>
+    <hta:application
+      id="app"
+      selection="no"
+      applicationname="app"
+      borderstyle="normal"
+      caption="yes"
+      icon="data/app.ico"
+      maximizebutton="yes"
+      minimizebutton="yes"
+      showintaskbar="yes"
+      singleinstance="yes"
+      sysmenu="yes"
+      windowstate="normal"
+      innerborder="no"
+    />
+
+    <meta http-equiv="x-ua-compatible" content="ie=9">
+    <script src="data/app.js"></script>
+    <link rel="stylesheet" type="text/css" href="data/app.css" />
+  </head>
+
+  <body trusted="yes" application="yes" onbeforeunload="App.exit()" onload="App.init()">
+    <form name="app">
+    <div id="source">
+      Source: <input name="source" disabled="disabled" placeholder="browse for source folder" />
+      <input type="button" value="..." onclick="App.source_browse()" />
+      <input type="button" value="reload" onclick="App.reel_update()" />
+      <input type="button" class="settings" value="settings" onclick="App.settings_open()" />
+    </div>
+
+    <br/>
+
+    <div id="reel">
+      <label class="entry">
+        <div class="imgh">
+          <img class="img" />
+        </div>
+        <input type="checkbox" class="check" value="..." /><span class="filename">...</span>
+      </label>
+    </div>
+
+    <br/>
+
+    <div id="target">
+      Target:
+      <input type="button" value="new target" onclick="App.target_new()" />
+      <br/>
+      <div class="target_ld">
+      <div id="target_list">
+        <label class="entry">
+          <input name="target" type="radio" value="..." class="check" /><span class="label">...</span>
+        </label>
+      </div>
+      <div id="target_details">
+        <div class="entry">...</div>
+      </div>
+      </div>
+    </div>
+
+    </form>
+
+    <form name="settings" style="display: none;">
+      Target: <input name="target" disabled="disabled" placeholder="browse for target folder" />
+      <input type="button" value="..." onclick="App.target_browse()" />
+      <br/>
+      <br/>
+      <br/>
+      <div style="text-align: center;">
+        <input type="button" value="save" onclick="App.settings_save()" />
+        <input type="button" value="close" onclick="App.settings_close()" />
+      </div>
+    </form>
+  </body>
+</html>
