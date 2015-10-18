@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>Catranfoma v1.0</title>
+    <title></title>
     <hta:application
       id="app"
       selection="no"
@@ -23,46 +23,86 @@
   </head>
 
   <body trusted="yes" application="yes" onbeforeunload="App.exit()" onload="App.init()">
+    <form name="drives">
+    <table class="layout">
+    <tr>
+      <td></td>
+    </tr>
+    <tr>
+      <td id="drive_list">
+      <label class="entry">
+        <div class="imgh">
+          <img  class="img" />
+        </div>
+        <input type="checkbox" class="check" value="..." /><span class="label">...</span>
+      </label>
+      </td>
+    </tr>
+    </table>
+    </form>
+
+    <!------------------------------------------------------------------------->
     <form name="app">
-    <div id="source">
-      Source: <input name="source" disabled="disabled" placeholder="browse for source folder" />
-      <input type="button" value="..." onclick="App.source_browse()" />
-      <input type="button" value="reload" onclick="App.reel_update()" />
-      <input type="button" class="settings" value="settings" onclick="App.settings_open()" />
-    </div>
+    <table class="layout">
+    <tr class="min"><td>
+      <table class="menu">
+      <tr>
+        <td width="1">
+          <input type="image" src="data/32/back36.png" alt="back" class="back" title="Go back to drive selection." />
+        </td>
+        <td>
+          Source: <input name="source" disabled="disabled" />
+          <input type="image" src="data/32/reload16.png" alt="reload" class="reload" title="Refresh image list." />
+        </td>
+        <td>
+          Location: <select name="location" class="location" />
+          <input type="image" src="data/32/add139.png" alt="add" class="location_add" title="Add a new location." />
+        </td>
+        <td>
+          <input type="image" src="data/32/tool305.png" alt="settings" class="settings" title="Open settings." />
+        </td>
+      </tr>
+      </table>
+    </td></tr>
 
-    <br/>
-
+    <tr class="min"><td>
     <div id="reel">
       <label class="entry">
         <div class="imgh">
           <img class="img" />
         </div>
-        <input type="checkbox" class="check" value="..." /><span class="filename">...</span>
+        <input type="checkbox" class="check" value="..." /><span class="label">...</span>
       </label>
     </div>
+    </td></tr>
 
-    <br/>
+    <tr class="min"><td>
+      <table class="species_menu">
+      <tr><td>
+        Species:
+        <input type="text" name="filter" class="filter" />
+      </td><td>
+        <input type="image" src="data/32/animal96.png" alt="manage" class="manage" title="Manage species list." />
+      </td></tr>
+      </table>
+    </td></tr>
 
-    <div id="target">
-      Target:
-      <input type="button" value="new target" onclick="App.target_new()" />
-      <br/>
-      <div class="target_ld">
-      <div id="target_list">
-        <label class="entry">
-          <input name="target" type="radio" value="..." class="check" /><span class="label">...</span>
-        </label>
-      </div>
-      <div id="target_details">
-        <div class="entry">...</div>
-      </div>
-      </div>
-    </div>
-
+    <tr class="max"><td>
+      <table class="species_list">
+      <tbody>
+      <label class="entry">
+      <tr><td>
+        <input type="radio" name="species" value="..." class="check" /><span class="common_name">...</span>
+      </label>
+      </td></tr>
+      </tbody>
+      </table>
+    </td></tr>
+    </table>
     </form>
 
-    <form name="settings" style="display: none;">
+    <!------------------------------------------------------------------------->
+    <form name="settings">
       Target: <input name="target" disabled="disabled" placeholder="browse for target folder" />
       <input type="button" value="..." onclick="App.target_browse()" />
       <br/>
@@ -72,6 +112,45 @@
         <input type="button" value="save" onclick="App.settings_save()" />
         <input type="button" value="close" onclick="App.settings_close()" />
       </div>
+    </form>
+
+    <!------------------------------------------------------------------------->
+    <form id="species" name="species">
+    <table class="layout">
+    <tr class="min"><td>
+      <table class="menu">
+      <tr>
+        <td width="1">
+          <input type="image" src="data/32/back36.png" alt="back" class="back" title="Go back image sorter." />
+        </td>
+        <td>
+          Search: <input name="filter" />
+        </td>
+        <td>
+          <input type="image" src="data/32/spreadsheet6.png" alt="import" class="import" title="Import species from excel." />
+        </td>
+      </tr>
+      </table>
+    </td></tr>
+    <tr class="max"><td>
+      <table class="list">
+      <thead>
+      <tr>
+        <th>Common Name</th>
+        <th>Species ID</th>
+      </tr>
+      </thead>
+      <tbody style="display: block; overflow: auto;">
+      <tr class="entry">
+        <td class="common_name">...</td>
+        <td class="species_id">...</td>
+      </tr>
+      </tbody>
+      </table>
+    </div>
+    </td></tr>
+    </table>
+
     </form>
   </body>
 </html>
