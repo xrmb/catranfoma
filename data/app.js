@@ -51,12 +51,40 @@ var SpeciesImport = {
 };
 
 
+var SpeciesDetails = [
+  'common_name',
+  //'ct_code',
+  'classification',
+  'species_id',
+  'kingdom',
+  'phylum',
+  'order',
+  'family',
+  'genus',
+  'species',
+  'authority',
+  //'infraspecific_rank',
+  //'infraspecific_name',
+  //'infraspecific_authority',
+  //'stock_subpopulation',
+  'synonyms',
+  'common_names_eng',
+  'common_names_fre',
+  'common_names_spa',
+  'red_list_status',
+  'red_list_criteria',
+  'red_list_criteria_version',
+  'year_assessed',
+  'population_trend',
+  'petitioned',
+]
+
 
 
 var App =
 {
   Appname: 'catranfoma',
-  Version: 1.1,
+  Version: 1.2,
 
   //--- member vars ------------------------------------------------------------
   _config:
@@ -94,9 +122,10 @@ var App =
 
     this._reel_entry = $$('#reel .entry')[0].cloneNode(true);
     this._drive_list_entry = $$('#drive_list .entry')[0].cloneNode(true);
-    this._species_list_entry = $$('#species .entry')[0].cloneNode(true);
-    this._app_species_list_entry = $$('#app .species_list .entry')[0].cloneNode(true);
-    //this._target_details_entry = $$('#target_details .entry')[0].cloneNode(true);
+    this._species_list_entry = $$('#species .list .entry')[0].cloneNode(true);
+    this._species_details_entry = $$('#species .details .entry')[0].cloneNode(true);
+    this._app_species_list_entry = $$('#app .species .list .entry')[0].cloneNode(true);
+    this._app_species_details_entry = $$('#app .species .details .entry')[0].cloneNode(true);
 
     //--- click handlers ---
     window.addEventListener('resize',function(e) { e.preventDefault(); App.window_resize(); });
@@ -105,7 +134,7 @@ var App =
     $$('#app .menu .location_add')[0].addEventListener('click', function(e) { e.preventDefault(); App.location_add(); });
     $$('#app .menu .location')[0].addEventListener('change', function(e) { e.preventDefault(); App.location_assoc(); });
     $$('#app .menu .settings')[0].addEventListener('click', function(e) { e.preventDefault(); App.window_open('settings'); });
-    $$('#app .species_menu .filter')[0].addEventListener('keyup', function(e) { e.preventDefault(); App.species_filter(e, this, $$('#app .species_list')[0]); });
+    $$('#app .species_menu .filter')[0].addEventListener('keyup', function(e) { e.preventDefault(); App.species_filter(e, this, $$('#app .species .list')[0]); });
     $$('#app .species_menu .manage')[0].addEventListener('click', function(e) { e.preventDefault(); App.species_open(); });
 
     $$('#species .menu .back')[0].addEventListener('click', function(e) { e.preventDefault(); App.window_close(); });
@@ -359,6 +388,8 @@ var App =
     document.app.style.display = (win == 'app' ? '' : 'none');
     document.settings.style.display = (win == 'settings' ? '' : 'none');
     document.species.style.display = (win == 'species' ? '' : 'none');
+
+    this.window_resize();
   },
 
   //----------------------------------------------------------------------------
@@ -375,6 +406,28 @@ var App =
     for(var i = 0; i < l.length; i++)
     {
       l[i].style.height = (window.innerHeight-0)+'px';
+    }
+
+    if(this._windows[this._windows.length-1] == 'app')
+    {
+      var td = $$('#app .species .list')[0].parentElement.parentElement;
+      var div = $$('#app .species .list')[0].parentElement;
+      div.style.maxHeight = (td.offsetHeight)+'px';
+
+      td = $$('#app .species .details')[0].parentElement.parentElement;
+      div = $$('#app .species .details')[0].parentElement;
+      div.style.maxHeight = (td.offsetHeight)+'px';
+    }
+
+    if(this._windows[this._windows.length-1] == 'species')
+    {
+      var td = $$('#species .list')[0].parentElement.parentElement;
+      var div = $$('#species .list')[0].parentElement;
+      div.style.maxHeight = (td.offsetHeight)+'px';
+
+      td = $$('#species .details')[0].parentElement.parentElement;
+      div = $$('#species .details')[0].parentElement;
+      div.style.maxHeight = (td.offsetHeight)+'px';
     }
   },
 
@@ -504,6 +557,7 @@ var App =
     this.location_detect();
     this.reel_update();
     this.species_list_update();
+    this.app_species_list_update();
 
     this.window_open('app');
   },
@@ -666,11 +720,6 @@ var App =
   {
     this.window_open('species');
 
-    var ch = $$('#species .list')[0].parentElement.offsetHeight;
-    var hh = $$('#species .list thead')[0].offsetHeight;
-    var b = $$('#species .list tbody')[0];
-    //b.style.height = (ch-hh)+'px';
-
     this.species_list_update();
     document.species.filter.focus();
   },
@@ -689,6 +738,7 @@ var App =
     {
       var entry = this._species_list_entry.cloneNode(true);
       entry.className = 'species-'+i;
+      $$('.check', entry)[0].value = i;
 
       for(var key in SpeciesImport)
       {
@@ -700,8 +750,17 @@ var App =
       list.appendChild(entry);
     }
 
+    var e = $$('#species .list .check');
+    for(var i = 0; i < e.length; i++)
+    {
+      e[i].addEventListener('click', function() { App.species_list_entry_click(this); });
+    }
+  },
 
-    list = $$('#app .species_list tbody')[0];
+  //----------------------------------------------------------------------------
+  app_species_list_update: function()
+  {
+    list = $$('#app .species .list tbody')[0];
     while(list.firstChild)
     {
       list.removeChild(list.firstChild);
@@ -722,14 +781,99 @@ var App =
 
       list.appendChild(entry);
     }
+
+    var e = $$('#app .species .list .check');
+    for(var i = 0; i < e.length; i++)
+    {
+      e[i].addEventListener('click', function() { App.app_species_list_entry_click(this); });
+    }
   },
 
+  //----------------------------------------------------------------------------
+  species_list_entry_click: function(sel)
+  {
+    var list = $$('#species .details tbody')[0];
+    while(list.firstChild)
+    {
+      list.removeChild(list.firstChild);
+    }
+
+    for(var i = 0; i < SpeciesDetails.length; i++)
+    {
+      var key = SpeciesDetails[i];
+      var entry = this._species_details_entry.cloneNode(true);
+
+      $$('.key', entry)[0].innerHTML = SpeciesImport[key]+':';
+      $$('.value', entry)[0].innerHTML = this._species[sel.value][key];
+
+      list.appendChild(entry);
+    }
+  },
+
+  //----------------------------------------------------------------------------
+  app_species_list_entry_click: function(sel)
+  {
+    var list = $$('#app .species .details tbody')[0];
+    while(list.firstChild)
+    {
+      list.removeChild(list.firstChild);
+    }
+
+    for(var i = 0; i < SpeciesDetails.length; i++)
+    {
+      var key = SpeciesDetails[i];
+      var entry = this._app_species_details_entry.cloneNode(true);
+
+      $$('.key', entry)[0].innerHTML = SpeciesImport[key]+':';
+      $$('.value', entry)[0].innerHTML = this._species[sel.value][key];
+
+      list.appendChild(entry);
+    }
+  },
+
+  //----------------------------------------------------------------------------
+  species_import_help: function(msg)
+  {
+    var help = $$('#species .help')[0];
+    var nohelp = $$('#species .nohelp')[0];
+    var open = help.className.match(/hidden/) ? false : true;
+
+    if(!msg)
+    {
+      if(open)
+      {
+        help.className += ' hidden';
+        nohelp.className = nohelp.className.replace(' hidden', '');
+      }
+      return;
+    }
+
+    if(open)
+    {
+      alert(msg);
+      return;
+    }
+
+    help.className = help.className.replace(' hidden', '');
+    nohelp.className += ' hidden';
+  },
 
   //----------------------------------------------------------------------------
   species_import: function()
   {
-    var lines = window.clipboardData.getData('Text').replace(/^\s*|\s*$/g, '').split(/[\n\r]+/);
-    if(lines.length < 2) return;
+    var cb = window.clipboardData.getData('Text');
+    if(!cb)
+    {
+      this.species_import_help('Clipboard is empty.');
+      return;
+    }
+
+    var lines = cb.replace(/^\s*|\s*$/g, '').split(/[\n\r]+/);
+    if(lines.length < 2)
+    {
+      this.species_import_help("Data in clipboard doesn't look right.");
+      return;
+    }
 
     //--- reverse lookup ---
     var sir = {};
@@ -754,9 +898,9 @@ var App =
     //--- check if we got all columns we need ---
     for(var key in SpeciesImport)
     {
-      if(ok[key] === null)
+      if(ok[key] === undefined)
       {
-        alert('Column "'+SpeciesImport[key]+'" not found.');
+        this.species_import_help('Column "'+SpeciesImport[key]+'" not found.');
         return;
       }
     }
@@ -775,10 +919,13 @@ var App =
     }
 
     alert(ss.length+' species imported.');
+    this.species_import_help();
 
     this._species = ss;
     this.species_save();
     this.species_list_update();
+    this.app_species_list_update();
+    document.species.filter.value = '';
   },
 
   //----------------------------------------------------------------------------

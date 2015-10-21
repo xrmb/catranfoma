@@ -44,7 +44,7 @@
     <!------------------------------------------------------------------------->
     <form name="app">
     <table class="layout">
-    <tr class="min"><td>
+    <tr class="min"><td colspan="2">
       <table class="menu">
       <tr>
         <td width="1">
@@ -65,7 +65,7 @@
       </table>
     </td></tr>
 
-    <tr class="min"><td>
+    <tr class="min"><td colspan="2">
     <div id="reel">
       <label class="entry">
         <div class="imgh">
@@ -76,7 +76,7 @@
     </div>
     </td></tr>
 
-    <tr class="min"><td>
+    <tr class="min"><td colspan="2">
       <table class="species_menu">
       <tr><td>
         Species:
@@ -87,23 +87,55 @@
       </table>
     </td></tr>
 
-    <tr class="max"><td>
-      <table class="species_list">
-      <tbody>
-      <label class="entry">
-      <tr><td>
-        <input type="radio" name="species" value="..." class="check" /><span class="common_name">...</span>
-      </label>
-      </td></tr>
-      </tbody>
-      </table>
-    </td></tr>
+    <tr class="max species">
+      <td style="width: 50%; padding: 0;">
+      <div style="max-height: 100px; overflow: auto;">
+        <table class="list">
+        <thead>
+        <tr>
+          <th>&nbsp;</th>
+          <th>Common Name</th>
+          <th>Species ID</th>
+        </tr>
+        </thead>
+        <tbody>
+        <label class="entry">
+        <tr>
+          <td class="min"><input type="radio" name="species" class="check" /></td>
+          <td class="common_name">...</td>
+          <td class="species_id">...</td>
+        </tr>
+        </label>
+        </tbody>
+        </table>
+      </div>
+      </td>
+
+      <td style="width: 50%; padding: 0;">
+      <div style="max-height: 100px; overflow: auto;">
+        <table class="details">
+        <thead>
+        <tr>
+          <th>Attribute</th>
+          <th>Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="entry">
+          <td class="min key">...</td>
+          <td class="value">...</td>
+        </tr>
+        </tbody>
+        </table>
+      </div>
+      </td>
+    </tr>
     </table>
     </form>
 
     <!------------------------------------------------------------------------->
     <form name="settings">
-      Target: <input name="target" disabled="disabled" placeholder="browse for target folder" />
+      Target: <input name="target" class="target" disabled="disabled" />
       <input type="button" value="..." onclick="App.target_browse()" />
       <br/>
       <br/>
@@ -117,14 +149,14 @@
     <!------------------------------------------------------------------------->
     <form id="species" name="species">
     <table class="layout">
-    <tr class="min"><td>
+    <tr class="min"><td colspan="2">
       <table class="menu">
       <tr>
         <td width="1">
           <input type="image" src="data/32/back36.png" alt="back" class="back" title="Go back image sorter." />
         </td>
         <td>
-          Search: <input name="filter" />
+          Search: <input type="text" name="filter" class="filter" />
         </td>
         <td>
           <input type="image" src="data/32/spreadsheet6.png" alt="import" class="import" title="Import species from excel." />
@@ -132,23 +164,61 @@
       </tr>
       </table>
     </td></tr>
-    <tr class="max"><td>
-      <table class="list">
-      <thead>
-      <tr>
-        <th>Common Name</th>
-        <th>Species ID</th>
-      </tr>
-      </thead>
-      <tbody style="display: block; overflow: auto;">
-      <tr class="entry">
-        <td class="common_name">...</td>
-        <td class="species_id">...</td>
-      </tr>
-      </tbody>
-      </table>
-    </div>
-    </td></tr>
+    <tr class="max help hidden">
+      <td colspan="2">
+        <div>
+        <b>Import species list from Excel</b><br/><br/>
+        1. open file with species list<br/>
+        2. remove any data filters<br/>
+        3. use "Select All" icon <img src="data/excel_all.png" alt="all" /> or press CTRL+A twice<br/>
+        4. copy selection to clipboard (CTRL+C)<br/>
+        5. click the import button in the menu again
+        </div>
+      </td>
+    </tr>
+    <tr class="max nohelp">
+      <td style="width: 50%; padding: 0;">
+      <div style="max-height: 100px; overflow: auto;">
+        <table class="list">
+        <thead>
+        <tr>
+          <th>&nbsp;</th>
+          <th>Common Name</th>
+          <th>Species ID</th>
+        </tr>
+        </thead>
+        <tbody>
+        <label class="entry">
+        <tr>
+          <td class="min"><input type="radio" name="species" class="check" /></td>
+          <td class="common_name">...</td>
+          <td class="species_id">...</td>
+        </tr>
+        </label>
+        </tbody>
+        </table>
+      </div>
+      </td>
+
+      <td style="width: 50%; padding: 0;">
+      <div style="max-height: 100px; overflow: auto;">
+        <table class="details">
+        <thead>
+        <tr>
+          <th>Attribute</th>
+          <th>Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="entry">
+          <td class="min key">...</td>
+          <td class="value">...</td>
+        </tr>
+        </tbody>
+        </table>
+      </div>
+      </td>
+    </tr>
     </table>
 
     </form>

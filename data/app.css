@@ -13,6 +13,22 @@ label
   cursor: pointer;
 }
 
+table
+{
+  border-collapse: collapse;
+}
+
+th
+{
+  text-align: left;
+  background-color: #ddd;
+}
+
+input[type=text]
+{
+  border: 1px solid #888;
+}
+
 input[type=image]
 {
   padding: 5px;
@@ -55,10 +71,20 @@ table.layout tr.max
   vertical-align: top;
 }
 
+table.layout td.min
+{
+  width: 1px;
+}
+
+.hidden
+{
+  display: none;
+}
 
 #app .menu,
 #app .species_menu,
-#app .species_list
+#app .species .list,
+#app .species .details
 {
   width: 100%;
 }
@@ -71,6 +97,14 @@ table.layout tr.max
 #app .species_menu .manage
 {
   float: right;
+}
+
+#app .species .details .key
+{
+  white-space: nowrap;
+  font-weight: bold;
+  vertical-align: top;
+  padding-right: 5px;
 }
 
 
@@ -116,53 +150,10 @@ table.layout tr.max
 }
 
 
-#target .species
-{
-  float: right;
-}
-
-#target .target_ld
-{
-  white-space: nowrap;
-  vertical-align: top;
-  overflow: hidden;
-  padding-top: 5px;
-}
-
-#target_list
-{
-  display: inline-block;
-  float: left;
-  width: 49.5%;
-  border: 1px solid #ccc;
-}
-
-#target_list .entry
-{
-  display: block;
-  padding: 5px;
-}
-
-#target_list .entry.selected
-{
-  background-color: #80bfff;
-}
-
-
-#target_details
-{
-  display: inline-block;
-  float: right;
-  width: 49.5%;
-  border: 1px solid #ccc;
-}
-
-
 #drive_list
 {
   text-align: center;
 }
-
 
 #drive_list .entry
 {
@@ -183,7 +174,29 @@ table.layout tr.max
 }
 
 
-#species .layout .list
+#species .list,
+#species .details
 {
   width: 100%;
+}
+
+#species .details .key
+{
+  white-space: nowrap;
+  font-weight: bold;
+  vertical-align: top;
+  padding-right: 5px;
+}
+
+#species .help td
+{
+  line-height: 200%;
+  text-align: center;
+  vertical-align: middle;
+}
+
+#species .help td div
+{
+  display: inline-block;
+  text-align: left;
 }
