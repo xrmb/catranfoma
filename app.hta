@@ -2,7 +2,7 @@
   <head>
     <title></title>
     <hta:application
-      id="app"
+      id="application"
       selection="no"
       applicationname="app"
       borderstyle="normal"
@@ -23,7 +23,7 @@
   </head>
 
   <body trusted="yes" application="yes" onbeforeunload="App.exit()" onload="App.init()">
-    <form name="drives">
+    <form id="drives" name="drives">
     <table class="layout">
     <tr>
       <td></td>
@@ -42,7 +42,7 @@
     </form>
 
     <!------------------------------------------------------------------------->
-    <form name="app">
+    <form id="app" name="app">
     <table class="layout">
     <tr class="min"><td colspan="2">
       <table class="menu">
@@ -71,7 +71,7 @@
         <div class="imgh">
           <img class="img" />
         </div>
-        <input type="checkbox" class="check" value="..." /><span class="label">...</span>
+        <input type="checkbox" name="image" class="check" value="..." /><span class="label">...</span>
       </label>
     </div>
     </td></tr>
@@ -79,9 +79,14 @@
     <tr class="min"><td colspan="2">
       <table class="species_menu">
       <tr><td>
-        Species:
+        Species Search:
         <input type="text" name="filter" class="filter" />
       </td><td>
+        Number of Individuals:
+        <input type="image" src="data/32/number41.png" name="ind" value="01" alt="1" class="ind" />
+        <input type="image" src="data/32/number40.png" name="ind" value="02" alt="2" class="ind" />
+        <input type="image" src="data/32/number37.png" name="ind" value="03" alt="3" class="ind" />
+
         <input type="image" src="data/32/animal96.png" alt="manage" class="manage" title="Manage species list." />
       </td></tr>
       </table>
@@ -101,7 +106,7 @@
         <tbody>
         <label class="entry">
         <tr>
-          <td class="min"><input type="radio" name="species" class="check" /></td>
+          <td class="min"><input type="radio" name="specie" class="check" value="..." /></td>
           <td class="common_name">...</td>
           <td class="species_id">...</td>
         </tr>
@@ -130,6 +135,17 @@
       </div>
       </td>
     </tr>
+
+    <tr class="min"><td colspan="2">
+      <table class="target">
+      <tr><td>
+        Target:
+        <input type="image" src="data/32/plussign2.png" name="copy" alt="copy" class="copy" title="Copy images to target." />
+        <span class="dir">...</span>
+        <span class="msg">...</span>
+      </td></tr>
+      </table>
+    </td></tr>
     </table>
     </form>
 
@@ -190,7 +206,7 @@
         <tbody>
         <label class="entry">
         <tr>
-          <td class="min"><input type="radio" name="species" class="check" /></td>
+          <td class="min"><input type="radio" name="specie" class="check" value="..." /></td>
           <td class="common_name">...</td>
           <td class="species_id">...</td>
         </tr>

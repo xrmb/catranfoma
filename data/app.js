@@ -84,7 +84,7 @@ var SpeciesDetails = [
 var App =
 {
   Appname: 'catranfoma',
-  Version: 1.2,
+  Version: 1.3,
 
   //--- member vars ------------------------------------------------------------
   _config:
@@ -120,25 +120,41 @@ var App =
 
     this._env = this._wsh.Environment('Process');
 
-    this._reel_entry = $$('#reel .entry')[0].cloneNode(true);
-    this._drive_list_entry = $$('#drive_list .entry')[0].cloneNode(true);
-    this._species_list_entry = $$('#species .list .entry')[0].cloneNode(true);
-    this._species_details_entry = $$('#species .details .entry')[0].cloneNode(true);
-    this._app_species_list_entry = $$('#app .species .list .entry')[0].cloneNode(true);
-    this._app_species_details_entry = $$('#app .species .details .entry')[0].cloneNode(true);
+    var entrify = function(selector)
+    {
+      var e = $$(selector)[0];
+      var c = e.cloneNode(true);
+      e.parentNode.removeChild(e);
+      return c;
+    };
 
-    //--- click handlers ---
+    this._reel_entry = entrify('#reel .entry');
+    this._drive_list_entry = entrify('#drive_list .entry');
+    this._species_list_entry = entrify('#species .list .entry');
+    this._species_details_entry = entrify('#species .details .entry');
+    this._app_species_list_entry = entrify('#app .species .list .entry');
+    this._app_species_details_entry = entrify('#app .species .details .entry');
+
+    //--- event handlers ---
     window.addEventListener('resize',function(e) { e.preventDefault(); App.window_resize(); });
     $$('#app .menu .back')[0].addEventListener('click', function(e) { e.preventDefault(); App.window_close(); });
     $$('#app .menu .reload')[0].addEventListener('click', function(e) { e.preventDefault(); App.reel_update(); });
     $$('#app .menu .location_add')[0].addEventListener('click', function(e) { e.preventDefault(); App.location_add(); });
-    $$('#app .menu .location')[0].addEventListener('change', function(e) { e.preventDefault(); App.location_assoc(); });
+    $$('#app .menu .location')[0].addEventListener('change', function(e) { e.preventDefault(); App.location_change(); });
     $$('#app .menu .settings')[0].addEventListener('click', function(e) { e.preventDefault(); App.window_open('settings'); });
     $$('#app .species_menu .filter')[0].addEventListener('keyup', function(e) { e.preventDefault(); App.species_filter(e, this, $$('#app .species .list')[0]); });
     $$('#app .species_menu .manage')[0].addEventListener('click', function(e) { e.preventDefault(); App.species_open(); });
+    $$('#app .target .copy')[0].addEventListener('click', function(e) { e.preventDefault(); alert('soon'); });
+
+    var inds = $$('#app .species_menu .ind');
+    for(var i = 0; i < inds.length; i++)
+    {
+      inds[i].addEventListener('click', function(e) { e.preventDefault(); App.individuals_click(this); });
+    }
 
     $$('#species .menu .back')[0].addEventListener('click', function(e) { e.preventDefault(); App.window_close(); });
     $$('#species .menu .import')[0].addEventListener('click', function(e) { e.preventDefault(); App.species_import(); });
+
 
     this._drive_watch = setInterval(function() { App.drive_watch(); }, 10*1000);
 
@@ -151,6 +167,8 @@ var App =
     //--- start with drives window ---
     this.drive_list_update();
     this.window_open('drives');
+
+    this.target_update();
   },
 
   //----------------------------------------------------------------------------
@@ -300,6 +318,8 @@ var App =
   reel_entry_click: function(el)
   {
     el.parentNode.toggleClass('selected');
+
+    this.target_update();
   },
 
   //----------------------------------------------------------------------------
@@ -471,12 +491,90 @@ var App =
   },
 
   //----------------------------------------------------------------------------
-  target_list_entry_click: function(el)
+  target_update: function()
   {
-    var s = $$('#target_list .selected');
-    if(s.length) s[0].toggleClass('selected');
+    if(this._windows[this._windows.length-1] != 'app') return;
 
-    el.parentNode.toggleClass('selected');
+    var ind = $$('#app .species_menu .ind.selected');
+
+    var species = -1;
+    if(document.app.specie)
+    {
+      for(var i = 0; i < document.app.specie.length; i++)
+      {
+        if(document.app.specie[i].checked)
+        {
+          species = parseInt(document.app.specie[i].value, 10);
+        }
+      }
+    }
+
+    var dir = '';
+    if(document.app.location.value)
+    {
+      dir += document.app.location.value;
+      if(species >= 0)
+      {
+        dir += '\\'+this._species[species].ct_code;
+        if(ind.length)
+        {
+          dir += '\\'+ind[0].value;
+        }
+      }
+    }
+
+
+    var msg;
+    for(;;)
+    {
+      if(document.app.location.selectedIndex == -1 || !document.app.location.value)
+      {
+        msg = document.app.location.options[0].text || 'no location selected';
+        break;
+      }
+
+      if(!document.app.location.value)
+      {
+        msg = 'no location selected';
+        break;
+      }
+
+      var images = 0;
+      if(document.app.image)
+      {
+        for(var i = 0; i < document.app.image.length; i++)
+        {
+          if(document.app.image[i].checked) images++;
+        }
+      }
+      if(!images)
+      {
+        msg = 'no image selected';
+        break;
+      }
+
+      if(species < 0)
+      {
+        msg = 'no species selected';
+        break;
+      }
+
+      if(!ind.length)
+      {
+        msg = 'number of individuals not set';
+        break;
+      }
+
+      break;
+    }
+
+    if(msg) msg = '(' + msg + ')';
+
+    $$('#app .target .dir')[0].innerHTML = dir;
+    $$('#app .target .msg')[0].innerHTML = msg || '';
+
+    //document.app.copy.disabled = msg ? true : false;
+    $$('#app .target .copy')[0].disabled = msg ? true : false;
   },
 
   //----------------------------------------------------------------------------
@@ -560,6 +658,8 @@ var App =
     this.app_species_list_update();
 
     this.window_open('app');
+
+    this.target_update();
   },
 
   //----------------------------------------------------------------------------
@@ -584,14 +684,14 @@ var App =
 
     if(!this._config.target || !this._fso.FolderExists(this._config.target))
     {
-      o[o.length] = new Option('invalid target');
+      o[o.length] = new Option('invalid target', '');
       return;
     }
 
     var fh = this._fso.GetFolder(this._config.target);
     if(!fh)
     {
-      o[o.length] = new Option('error reading target');
+      o[o.length] = new Option('error reading target', '');
       return;
     }
 
@@ -609,7 +709,7 @@ var App =
 
     if(!o.length)
     {
-      o[o.length] = new Option('no locations found');
+      o[o.length] = new Option('no locations found', '');
     }
   },
 
@@ -628,7 +728,7 @@ var App =
   },
 
   //----------------------------------------------------------------------------
-  location_assoc: function()
+  location_change: function()
   {
     var dh = this._fso.GetDrive(this._fso.GetDriveName(document.app.source.value));
     if(dh.DriveType == 1/*removable*/)
@@ -639,6 +739,8 @@ var App =
     {
       this._locations[ document.app.source.value ] = document.app.location.value;
     }
+
+    this.target_update();
   },
 
 
@@ -689,7 +791,7 @@ var App =
     var json = fh.ReadAll();
     fh.Close();
 
-    var data;
+    var data = [];
     try
     {
       data = JSON.parse(json);
@@ -699,7 +801,7 @@ var App =
       alert('Loading species failed ('+e.message+')');
       return;
     }
-    this._species = data;
+    this._species = data.sort(function(a, b) { return a.common_name.localeCompare(b.common_name); });
   },
 
 
@@ -829,6 +931,8 @@ var App =
 
       list.appendChild(entry);
     }
+
+    this.target_update();
   },
 
   //----------------------------------------------------------------------------
@@ -945,5 +1049,22 @@ var App =
 
       $$('.species-'+i+' tr', list)[0].style.display = match ? '' : 'none';
     }
+  },
+
+  //----------------------------------------------------------------------------
+  individuals_click: function(el)
+  {
+    var inds = $$('#app .species_menu .ind');
+
+    for(var i = 0; i < inds.length; i++)
+    {
+      inds[i].className = inds[i].className.replace(/\s*selected\s*/, '');
+      if(inds[i] === el)
+      {
+        inds[i].className += ' selected';
+      }
+    }
+
+    this.target_update();
   }
 }

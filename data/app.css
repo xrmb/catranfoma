@@ -38,7 +38,7 @@ input[type=image]
 
 input[type=image]:hover
 {
-  border-color: #80bfff;
+  border-color: #80bfff !important;
 }
 
 body, html
@@ -87,6 +87,12 @@ table.layout td.min
 #app .species .details
 {
   width: 100%;
+}
+
+#app .species_menu .ind.selected
+{
+  border-color: #fff;
+  background-color: #80bfff;
 }
 
 #app .menu .settings
