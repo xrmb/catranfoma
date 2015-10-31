@@ -51,7 +51,7 @@
           <input type="image" src="data/32/back36.png" alt="back" class="back" title="Go back to drive selection." />
         </td>
         <td>
-          Source: <input name="source" disabled="disabled" />
+          Source: <input type="text" name="source" disabled="disabled" />
           <input type="image" src="data/32/reload16.png" alt="reload" class="reload" title="Refresh image list." />
         </td>
         <td>
@@ -150,8 +150,10 @@
     </form>
 
     <!------------------------------------------------------------------------->
-    <form name="settings">
-      Target: <input name="target" class="target" disabled="disabled" />
+    <form id="settings" name="settings">
+    <table class="layout">
+    <tr><td style="vertical-align: top; padding: 15px;">
+      Target: <input type="input" name="target" class="target" disabled="disabled" />
       <input type="button" value="..." onclick="App.target_browse()" />
       <br/>
       <br/>
@@ -160,6 +162,8 @@
         <input type="button" value="save" onclick="App.settings_save()" />
         <input type="button" value="close" onclick="App.settings_close()" />
       </div>
+    </td></tr>
+    </table>
     </form>
 
     <!------------------------------------------------------------------------->

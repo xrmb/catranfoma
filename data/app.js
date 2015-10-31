@@ -84,7 +84,7 @@ var SpeciesDetails = [
 var App =
 {
   Appname: 'catranfoma',
-  Version: 1.3,
+  Version: 1.4,
 
   //--- member vars ------------------------------------------------------------
   _config:
@@ -101,6 +101,7 @@ var App =
   _species: [],
   _windows: [],
   _drives_cid: '-',
+  _exif_date_cache: {},
 
 
   //----------------------------------------------------------------------------
@@ -495,32 +496,73 @@ var App =
   {
     if(this._windows[this._windows.length-1] != 'app') return;
 
-    var ind = $$('#app .species_menu .ind.selected');
+    var image;
+    if(document.app.image)
+    {
+      for(var i = 0; i < document.app.image.length; i++)
+      {
+        if(document.app.image[i].checked)
+        {
+          image = document.app.image[i].value;
+          break;
+        }
+      }
+    }
 
-    var species = -1;
+
+    var species;
     if(document.app.specie)
     {
       for(var i = 0; i < document.app.specie.length; i++)
       {
         if(document.app.specie[i].checked)
         {
-          species = parseInt(document.app.specie[i].value, 10);
+          species = document.app.specie[i].value;
+          break;
         }
       }
     }
 
+
+    var ind = $$('#app .species_menu .ind.selected');
+    ind = ind.length ? ind[0].value : null;
+
+
     var dir = '';
     if(document.app.location.value)
     {
-      dir += document.app.location.value;
-      if(species >= 0)
-      {
-        dir += '\\'+this._species[species].ct_code;
-        if(ind.length)
-        {
-          dir += '\\'+ind[0].value;
-        }
-      }
+      dir = document.app.location.value;
+    }
+    else
+    {
+      dir = (this._config.target || '?') + '\\?';
+    }
+
+    if(species)
+    {
+      dir += '\\'+species;
+    }
+    else
+    {
+      dir += '\\?';
+    }
+
+    if(ind)
+    {
+      dir += '\\'+ind;
+    }
+    else
+    {
+      dir += '\\?';
+    }
+
+    if(image && this.exifDate(image))
+    {
+      dir += '\\'+this.exifDate(image);
+    }
+    else
+    {
+      dir += '\\?';
     }
 
 
@@ -539,29 +581,27 @@ var App =
         break;
       }
 
-      var images = 0;
-      if(document.app.image)
-      {
-        for(var i = 0; i < document.app.image.length; i++)
-        {
-          if(document.app.image[i].checked) images++;
-        }
-      }
-      if(!images)
+      if(!image)
       {
         msg = 'no image selected';
         break;
       }
 
-      if(species < 0)
+      if(!species)
       {
         msg = 'no species selected';
         break;
       }
 
-      if(!ind.length)
+      if(!ind)
       {
         msg = 'number of individuals not set';
+        break;
+      }
+
+      if(!this.exifDate(image))
+      {
+        msg = 'can\'t get photo taken date';
         break;
       }
 
@@ -839,8 +879,9 @@ var App =
     for(var i = 0; i < this._species.length; i++)
     {
       var entry = this._species_list_entry.cloneNode(true);
-      entry.className = 'species-'+i;
-      $$('.check', entry)[0].value = i;
+      var check = $$('.check', entry)[0];
+      check.className += ' species-'+i;
+      check.value = this._species[i].ct_code;
 
       for(var key in SpeciesImport)
       {
@@ -868,11 +909,47 @@ var App =
       list.removeChild(list.firstChild);
     }
 
+    var special = [
+        {
+          common_name:  'Unsorted',
+          ct_code:      '01_unsorted',
+          species_id:   'N/A',
+        },
+        {
+          common_name:  'Ghost',
+          ct_code:      '02_ghost',
+          species_id:   'N/A',
+        },
+        {
+          common_name:  'Unknown',
+          ct_code:      '03_unknown',
+          species_id:   'N/A',
+        }
+      ];
+
+    for(var i = 0; i < special.length; i++)
+    {
+      var entry = this._app_species_list_entry.cloneNode(true);
+      var check = $$('.check', entry)[0];
+      //check.className += ' species-'+i;
+      check.value = special[i].ct_code;
+
+      for(var key in SpeciesImport)
+      {
+        var el = $$('.'+key, entry)[0];
+        if(!el) continue;
+        el.firstChild.data = special[i][key];
+      }
+
+      list.appendChild(entry);
+    }
+
     for(var i = 0; i < this._species.length; i++)
     {
       var entry = this._app_species_list_entry.cloneNode(true);
-      entry.className = 'species-'+i;
-      $$('.check', entry)[0].value = i;
+      var check = $$('.check', entry)[0];
+      check.className += ' species-'+i;
+      check.value = this._species[i].ct_code;
 
       for(var key in SpeciesImport)
       {
@@ -900,13 +977,16 @@ var App =
       list.removeChild(list.firstChild);
     }
 
+    if(!sel.className.match(/species-(\d+)/)) return;
+    var id = parseInt(RegExp.$1);
+
     for(var i = 0; i < SpeciesDetails.length; i++)
     {
       var key = SpeciesDetails[i];
       var entry = this._species_details_entry.cloneNode(true);
 
       $$('.key', entry)[0].innerHTML = SpeciesImport[key]+':';
-      $$('.value', entry)[0].innerHTML = this._species[sel.value][key];
+      $$('.value', entry)[0].innerHTML = this._species[id][key];
 
       list.appendChild(entry);
     }
@@ -921,18 +1001,21 @@ var App =
       list.removeChild(list.firstChild);
     }
 
+    this.target_update();
+
+    if(!sel.className.match(/species-(\d+)/)) return;
+    var id = parseInt(RegExp.$1);
+
     for(var i = 0; i < SpeciesDetails.length; i++)
     {
       var key = SpeciesDetails[i];
       var entry = this._app_species_details_entry.cloneNode(true);
 
       $$('.key', entry)[0].innerHTML = SpeciesImport[key]+':';
-      $$('.value', entry)[0].innerHTML = this._species[sel.value][key];
+      $$('.value', entry)[0].innerHTML = this._species[id][key];
 
       list.appendChild(entry);
     }
-
-    this.target_update();
   },
 
   //----------------------------------------------------------------------------
@@ -1066,5 +1149,22 @@ var App =
     }
 
     this.target_update();
+  },
+
+  //----------------------------------------------------------------------------
+  exifDate: function(file)
+  {
+    var fh = this._fso.GetFile(file);
+    if(!fh) return null;
+
+    var id = fh.Path +'|'+ fh.Size;
+    if(!this._exif_date_cache[id])
+    {
+      var dt = new Date(fh.DateLastModified).toJSON().replace(/\.\d+Z$/, '').replace(/\D/g, ' ');
+      var ext = fh.Path.replace(/^.*\./, '.').toLowerCase();
+      this._exif_date_cache[id] = dt + ext;
+    }
+
+    return this._exif_date_cache[id];
   }
 }

@@ -24,7 +24,8 @@ th
   background-color: #ddd;
 }
 
-input[type=text]
+input[type=text],
+select
 {
   border: 1px solid #888;
 }
@@ -39,6 +40,16 @@ input[type=image]
 input[type=image]:hover
 {
   border-color: #80bfff !important;
+}
+
+input[type=image]:disabled
+{
+  border-color: transparent !important;
+}
+
+input[type=image]:disabled:hover
+{
+  border-color: red !important;
 }
 
 body, html
@@ -206,3 +217,5 @@ table.layout td.min
   display: inline-block;
   text-align: left;
 }
+
+
