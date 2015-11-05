@@ -84,7 +84,7 @@ var SpeciesDetails = [
 var App =
 {
   Appname: 'catranfoma',
-  Version: 1.5,
+  Version: 1.6,
 
   //--- member vars ------------------------------------------------------------
   _config:
@@ -249,12 +249,24 @@ var App =
   },
 
   //----------------------------------------------------------------------------
-  config_save: function()
+  config_folder: function()
   {
     if(!this._fso.FolderExists('config'))
     {
-      if(!this._fso.CreateFolder('config')) return;
+      if(!this._fso.CreateFolder('config'))
+      {
+        alert('Error creating "config" folder.');
+        return false;
+      }
     }
+
+    return true;
+  },
+
+  //----------------------------------------------------------------------------
+  config_save: function()
+  {
+    if(!this.config_folder()) return;
 
     this._config.winmax = (window.outerWidth > screen.availWidth && window.outerHeight > screen.availHeight) ? 'yes' : 'no';
     if(this._config.winmax == 'no')
@@ -848,6 +860,8 @@ var App =
   //----------------------------------------------------------------------------
   species_save: function()
   {
+    if(!this.config_folder()) return;
+
     var json = JSON.stringify(this._species, null, 2/*indent*/);
 
     var fh = this._fso.CreateTextFile('config/species.json', true/*overwrite*/);
