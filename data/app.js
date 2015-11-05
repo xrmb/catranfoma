@@ -84,7 +84,7 @@ var SpeciesDetails = [
 var App =
 {
   Appname: 'catranfoma',
-  Version: 1.4,
+  Version: 1.5,
 
   //--- member vars ------------------------------------------------------------
   _config:
@@ -380,7 +380,7 @@ var App =
 
     if(count == 0)
     {
-      return reel_message('No images found.');
+      return this.reel_message('No images found.');
     }
 
 
